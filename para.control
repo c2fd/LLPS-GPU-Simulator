@@ -1,0 +1,138 @@
+# -*- mode: Shell-script -*-
+
+## Use which GPU device?
+## On a host with 3 cards, this value can be 0, 1, or 2.
+## Use -1 to let cuda choose a card for us.
+device = -1                     
+
+
+## Output what data?  See "tools.h" for details
+OUTPUT = 3  #save all data
+
+# Should we output the ghost cells?
+#
+# 0 -- write Nx *Ny *Nz
+# 1 -- write Nxp*Nyp*Nzp
+write_pad = 1
+
+
+# How often to save an output file?
+# #
+# #     0              -- no save
+# #    -5   (negative) -- save every 5 steps
+# #    +5.0 (positive) -- save every t = 5 * t_0.
+
+save = 0.1
+s1:save	 =-1
+s100:save=-100
+s200:save=-200
+s500:save=-500
+
+
+# Don't save before this round
+first_save_round = 0
+
+
+################
+###
+### Simulation setting
+###
+
+
+#
+# End time 
+#
+t_end = 10
+
+
+# Can run on any sizes, but...
+# - 2^n-2  is most memory efficient.
+# - 2^n    is best for FFT.
+Nx = 512
+Ny = 512
+N128:Ny = 128
+N128:Nz = 128
+N256:Ny = 256
+N256:Nz = 256
+N512:Ny = 512
+N512:Nz = 512
+
+#
+# Domain size
+
+Ly = 1.
+Lz = 1.
+L1:Ly = 1.
+L1:Lz = 1.
+L4:Ly = 4.
+L4:Lz = 4.
+
+
+# Time Step
+dt = 1.0e-3
+dt01:dt=0.01
+dt005:dt=0.005
+dt0025:dt=0.0025
+dt00125:dt=0.00125
+dt000625:dt=0.000625
+dt0003125:dt=0.0003125
+dt00015625:dt=0.00015625
+dt000078125:dt=0.000078125
+dt0000390625:dt=0.0000390625
+dt001:dt=0.001
+dt0001:dt=0.0001
+dt00001:dt=0.00001
+dt000001:dt=0.000001
+
+
+
+
+
+# Kernel block size
+dbx = 2
+dby = 2
+dbz = 16          # 16 doubles == 128 bytes
+
+
+
+
+
+
+################
+### Toggles
+do_clip = false #true
+
+### Numerical handling of phi's equation
+do_phi = BDF2
+#do_phi = CN
+
+
+
+
+################
+###
+### Initial values
+###
+
+interface_width = 0.02  # see gallery::threshold
+shape_phi = zero #Square 0.3 #zero
+shape_W   = Random2 0. 1.0
+shape_R	  = Random2 0. 1.0 #Square 1. #Random 0. 1.0
+
+#Maximum initial values for phi,W,R
+init_phi = 1
+init_W	 = 1
+init_R	 = 1
+
+
+
+################
+###
+### Iterative solver
+###
+
+bicg_iteration_limit    = 2000
+bicg_verbose            = 0
+bicg_relative_tolerance_phi = 1e-12
+bicg_relative_tolerance_R = 1e-12
+bicg_relative_tolerance_W = 1e-12
